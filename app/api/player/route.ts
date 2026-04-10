@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-  const { token, playerTag } = await req.json();
+const PROXY_URL = process.env.PROXY_URL;
+const PROXY_SECRET = process.env.PROXY_SECRET;
 
-  if (!token || !playerTag) {
+export async function POST(req: NextRequest) {
+  if (!PROXY_URL || !PROXY_SECRET) {
     return NextResponse.json(
-      { error: "API token and player tag are required." },
+      { error: "Server misconfigured: proxy not set." },
+      { status: 500 }
+    );
+  }
+
+  const { playerTag } = await req.json();
+
+  if (!playerTag) {
+    return NextResponse.json(
+      { error: "Player tag is required." },
       { status: 400 }
     );
   }
 
-  // Encode # as %23 for the URL
-  const encodedTag = encodeURIComponent(playerTag.startsWith("#") ? playerTag : `#${playerTag}`);
+  const encodedTag = encodeURIComponent(
+    playerTag.startsWith("#") ? playerTag : `#${playerTag}`
+  );
 
-  const res = await fetch(`https://api.clashofclans.com/v1/players/${encodedTag}`, {
+  const res = await fetch(`${PROXY_URL}/v1/players/${encodedTag}`, {
     headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
+      "x-proxy-secret": PROXY_SECRET,
+      accept: "application/json",
     },
   });
 
