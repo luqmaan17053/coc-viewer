@@ -8,7 +8,6 @@ type Tab = "player" | "clan";
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("player");
-  const [token, setToken] = useState("");
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,9 +29,7 @@ export default function Home() {
 
     try {
       const endpoint = tab === "player" ? "/api/player" : "/api/clan";
-      const body = tab === "player"
-        ? { token, playerTag: tag }
-        : { token, clanTag: tag };
+      const body = tab === "player" ? { playerTag: tag } : { clanTag: tag };
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -97,31 +94,6 @@ export default function Home() {
         >
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
-              API Token
-            </label>
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="Paste your Clash of Clans API token"
-              required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Get your token at{" "}
-              <a
-                href="https://developer.clashofclans.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-yellow-500 hover:underline"
-              >
-                developer.clashofclans.com
-              </a>
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
               {label}
             </label>
             <input
@@ -152,7 +124,7 @@ export default function Home() {
 
         {/* Results */}
         {data && tab === "player" && <PlayerCard player={data} />}
-        {data && tab === "clan" && <ClanCard clan={data} token={token} />}
+        {data && tab === "clan" && <ClanCard clan={data} />}
       </div>
     </main>
   );

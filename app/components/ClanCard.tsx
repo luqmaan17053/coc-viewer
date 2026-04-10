@@ -66,8 +66,7 @@ function StatBox({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function PlayerModal({ member, token, onClose }: { member: ClanMember; token: string; onClose: () => void }) {
-  const [loading, setLoading] = useState(false);
+function PlayerModal({ member, onClose }: { member: ClanMember; onClose: () => void }) {  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [playerData, setPlayerData] = useState<any>(null);
@@ -77,7 +76,7 @@ function PlayerModal({ member, token, onClose }: { member: ClanMember; token: st
     fetch("/api/player", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, playerTag: member.tag }),
+      body: JSON.stringify({ playerTag: member.tag }),
     })
       .then((r) => r.json())
       .then((d) => {
@@ -129,7 +128,7 @@ function PlayerModal({ member, token, onClose }: { member: ClanMember; token: st
   );
 }
 
-export default function ClanCard({ clan, token }: { clan: ClanData; token: string }) {
+export default function ClanCard({ clan }: { clan: ClanData }) {
   const [selectedMember, setSelectedMember] = useState<ClanMember | null>(null);
 
   const sorted = [...(clan.memberList ?? [])].sort(
@@ -260,10 +259,9 @@ export default function ClanCard({ clan, token }: { clan: ClanData; token: strin
       )}
 
       {/* Player Modal */}
-      {selectedMember && (
+        {selectedMember && (
         <PlayerModal
           member={selectedMember}
-          token={token}
           onClose={() => setSelectedMember(null)}
         />
       )}
