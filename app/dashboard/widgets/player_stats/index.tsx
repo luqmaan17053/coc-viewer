@@ -1,18 +1,18 @@
 import type { WidgetDefinition } from "../types";
-import PlayerStatsWidget from "./Widget";
-
-type PlayerStatsConfig = Record<string, never>;
+import PlayerStatsWidget, { type PlayerStatsConfig } from "./Widget";
+import PlayerStatsConfigForm from "./ConfigForm";
 
 export const definition: WidgetDefinition<PlayerStatsConfig> = {
   type: "player_stats",
   displayName: "Player Stats",
-  description: "Your player profile card",
+  description: "Any player's profile card (their stats, league, clan).",
   icon: "👤",
-  defaultConfig: {},
+  defaultConfig: { useLinkedPlayer: true, playerTag: null },
   defaultLayout: {
-  lg: { w: 4, h: 5, minW: 3, minH: 5 },
-  sm: { w: 1, h: 5, minH: 5 },
-},
+    lg: { w: 4, h: 5, minW: 3, minH: 5 },
+    sm: { w: 1, h: 5, minH: 5 },
+  },
+  requiresConfigOnAdd: true,
   Widget: PlayerStatsWidget,
-  ConfigForm: null,
+  ConfigForm: PlayerStatsConfigForm,
 };

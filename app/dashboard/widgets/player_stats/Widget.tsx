@@ -1,14 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { useLinkedPlayer } from "../../hooks";
+import { useLinkedPlayer, usePlayer } from "../../hooks";
 import type { WidgetProps } from "../types";
 
-// This widget takes no per-widget config — it uses the user's linked player tag globally
-type PlayerStatsConfig = Record<string, never>;
+export interface PlayerStatsConfig {
+  /** If `useLinkedPlayer` is true, playerTag is ignored and the user's linked player is used. */
+  useLinkedPlayer: boolean;
+  /** Used only when useLinkedPlayer is false. */
+  playerTag: string | null;
+}
 
-export default function PlayerStatsWidget({ editMode, onRemove, onOpenConfig }: WidgetProps<PlayerStatsConfig>) {
-  const { data: player, isLoading, error } = useLinkedPlayer();
+export default function PlayerStatsWidget({
+  config,
+  editMode,
+  onRemove,
+  onOpenConfig,
+}: WidgetProps<PlayerStatsConfig>) {
+  const follow = config.useLinkedPlayer;
+  const linkedQuery = useLinkedPlayer();
+  const fixedQuery = usePlayer(follow ? null : config.playerTag);
+
+  const query = follow ? linkedQuery : fixedQuery;
+  const { data: player, isLoading, error } = query;
+
+  const noConfigYet = !follow && !config.playerTag;
 
   return (
     <div className="relative h-full bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
@@ -17,16 +33,15 @@ export default function PlayerStatsWidget({ editMode, onRemove, onOpenConfig }: 
       )}
 
       <div className="flex-1 p-4 overflow-auto">
-        {isLoading && <LoadingState />}
-        {error && <ErrorState message={(error as Error).message} />}
-        {!isLoading && !error && !player && <EmptyState />}
-        {player && <PlayerContent player={player} />}
+        {noConfigYet && <UnconfiguredState editMode={editMode} onOpenConfig={onOpenConfig} />}
+        {!noConfigYet && isLoading && <LoadingState />}
+        {!noConfigYet && error && <ErrorState message={(error as Error).message} />}
+        {!noConfigYet && !isLoading && !error && !player && <EmptyLinkedState follow={follow} />}
+        {!noConfigYet && player && <PlayerContent player={player} />}
       </div>
     </div>
   );
 }
-
-// --- States ---
 
 function LoadingState() {
   return (
@@ -44,17 +59,38 @@ function ErrorState({ message }: { message: string }) {
   );
 }
 
-function EmptyState() {
+function EmptyLinkedState({ follow }: { follow: boolean }) {
   return (
     <div className="flex items-center justify-center h-full text-center px-4">
       <p className="text-sm text-gray-500">
-        Set your player tag in <span className="text-yellow-400">Profile</span> to see your stats.
+        {follow ? (
+          <>Set your player tag in <span className="text-yellow-400">Profile</span> to see your stats.</>
+        ) : (
+          <>Player not found.</>
+        )}
       </p>
     </div>
   );
 }
 
-// --- Content ---
+function UnconfiguredState({ editMode, onOpenConfig }: { editMode: boolean; onOpenConfig: () => void }) {
+  return (
+    <div className="flex items-center justify-center h-full text-center px-4">
+      <div>
+        <p className="text-sm text-gray-500 mb-2">No player set.</p>
+        {editMode && (
+          <button
+            type="button"
+            onClick={onOpenConfig}
+            className="text-xs text-yellow-400 hover:underline"
+          >
+            Click ⚙ to configure
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function PlayerContent({ player }: { player: any }) {
@@ -106,8 +142,6 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-// --- Edit mode chrome ---
-
 function WidgetChrome({
   title,
   onRemove,
@@ -141,3 +175,6 @@ function WidgetChrome({
     </div>
   );
 }
+
+// Now that the clan section is always shown when the player has a clan,
+// the showClan toggle is gone. Player-stats widget is simpler.

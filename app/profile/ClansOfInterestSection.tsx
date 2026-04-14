@@ -169,7 +169,7 @@ export default function ClansOfInterestSection({
               placeholder="#CLAN12345"
               autoComplete="off"
               autoFocus
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition font-mono"
+              className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition font-mono"
             />
             <button
               type="submit"

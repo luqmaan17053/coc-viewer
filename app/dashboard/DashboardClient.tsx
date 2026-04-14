@@ -7,6 +7,8 @@ import { WIDGET_REGISTRY } from "./widgets/registry";
 import { saveLayouts, removeWidget, addWidget } from "./actions";
 import WidgetPicker from "./WidgetPicker";
 import { useBreakpoint } from "./useBreakpoint";
+import WidgetConfigModal from "./WidgetConfigModal";
+import { updateWidgetConfig } from "./actions";
 
 const BREAKPOINTS = { lg: 1024, sm: 0 };
 const COLS = { lg: 12, sm: 1 };
@@ -36,6 +38,8 @@ export default function DashboardClient({
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const [, startTransition] = useTransition();
+  const [configOpenFor, setConfigOpenFor] = useState<string | null>(null);
+  const [pendingWidgetType, setPendingWidgetType] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   // Force-exit edit mode when viewport shrinks to mobile (edit is desktop-only)
@@ -107,8 +111,38 @@ export default function DashboardClient({
     });
   }
 
-  async function handleAddWidget(widgetType: string) {
+  async function handleSaveWidgetConfig(newConfig: Record<string, unknown>) {
+    if (!configOpenFor) return;
+    const widgetId = configOpenFor;
+
+    // Optimistic
+    setWidgets((prev) => prev.map((w) => (w.id === widgetId ? { ...w, config: newConfig } : w)));
+    setConfigOpenFor(null);
+
+    startTransition(async () => {
+      const result = await updateWidgetConfig(widgetId, newConfig);
+      if (result?.error) {
+        alert(`Failed to save config: ${result.error}. Refresh to see actual state.`);
+      }
+    });
+  }
+
+  function handlePickWidget(widgetType: string) {
     setPickerOpen(false);
+    const def = WIDGET_REGISTRY[widgetType];
+    if (!def) return;
+
+    if (def.requiresConfigOnAdd) {
+      // Open config modal in "create" mode — widget only gets added after Save
+      setPendingWidgetType(widgetType);
+      return;
+    }
+
+    // Otherwise, add immediately with defaults
+    addWidgetWithConfig(widgetType, def.defaultConfig);
+  }
+
+  async function addWidgetWithConfig(widgetType: string, config: Record<string, unknown>) {
     const def = WIDGET_REGISTRY[widgetType];
     if (!def) return;
 
@@ -131,19 +165,14 @@ export default function DashboardClient({
       ...(def.defaultLayout.sm.minH && { minH: def.defaultLayout.sm.minH }),
     };
 
-    setWidgets((prev) => [...prev, { id: tempId, type: widgetType, config: def.defaultConfig }]);
+    setWidgets((prev) => [...prev, { id: tempId, type: widgetType, config }]);
     setLayouts((prev) => ({
       lg: [...prev.lg, newLgItem],
       sm: [...prev.sm, newSmItem],
     }));
 
     startTransition(async () => {
-      const result = await addWidget(
-        widgetType,
-        def.defaultConfig,
-        def.defaultLayout.lg,
-        def.defaultLayout.sm
-      );
+      const result = await addWidget(widgetType, config, def.defaultLayout.lg, def.defaultLayout.sm);
       if (result?.error || !result?.widgetId) {
         setWidgets((prev) => prev.filter((w) => w.id !== tempId));
         setLayouts((prev) => ({
@@ -188,7 +217,7 @@ export default function DashboardClient({
         <WidgetPicker
           isOpen={pickerOpen}
           onClose={() => setPickerOpen(false)}
-          onPick={handleAddWidget}
+          onPick={handlePickWidget}
         />
       </>
     );
@@ -292,7 +321,7 @@ export default function DashboardClient({
                   config={widget.config}
                   editMode={editMode && !isRealMobile}
                   onRemove={() => handleRemoveWidget(widget.id)}
-                  onOpenConfig={() => alert("Widget config coming soon")}
+                  onOpenConfig={() => setConfigOpenFor(widget.id)}
                 />
               </div>
             );
@@ -303,8 +332,41 @@ export default function DashboardClient({
       <WidgetPicker
         isOpen={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        onPick={handleAddWidget}
+        onPick={handlePickWidget}
       />
+      {(() => {
+        // Case 1: Editing an existing widget
+        if (configOpenFor) {
+          const widget = widgets.find((w) => w.id === configOpenFor);
+          const def = widget ? WIDGET_REGISTRY[widget.type] : null;
+          return (
+            <WidgetConfigModal
+              isOpen={!!widget && !!def}
+              definition={def}
+              initialConfig={widget?.config ?? {}}
+              onSave={handleSaveWidgetConfig}
+              onClose={() => setConfigOpenFor(null)}
+            />
+          );
+        }
+        // Case 2: Creating a new widget that requires config first
+        if (pendingWidgetType) {
+          const def = WIDGET_REGISTRY[pendingWidgetType];
+          return (
+            <WidgetConfigModal
+              isOpen={!!def}
+              definition={def}
+              initialConfig={def?.defaultConfig ?? {}}
+              onSave={(newConfig) => {
+                addWidgetWithConfig(pendingWidgetType, newConfig);
+                setPendingWidgetType(null);
+              }}
+              onClose={() => setPendingWidgetType(null)}
+            />
+          );
+        }
+        return null;
+      })()}
     </>
   );
 }
