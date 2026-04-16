@@ -8,6 +8,7 @@ export interface Profile {
   main_clan_tag: string | null;
   clans_of_interest: string[];
   display_name: string | null;
+  selected_countries: string[];
 }
 
 export function useProfile() {
@@ -19,13 +20,14 @@ export function useProfile() {
       if (!user) throw new Error("Not signed in");
       const { data, error } = await supabase
         .from("profiles")
-        .select("linked_player_tag, main_clan_tag, clans_of_interest, display_name")
+        .select("linked_player_tag, main_clan_tag, clans_of_interest, display_name, selected_countries")
         .eq("id", user.id)
         .single();
       if (error) throw error;
       return {
         ...data,
         clans_of_interest: (data.clans_of_interest as string[] | null) ?? [],
+        selected_countries: (data.selected_countries as string[] | null) ?? [],
       };
     },
     staleTime: 5 * 60_000,

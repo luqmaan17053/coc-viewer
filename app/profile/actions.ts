@@ -199,6 +199,20 @@ export async function promoteClanOfInterestToMain(tag: string) {
   return { success: true };
 }
 
+export async function saveSelectedCountries(codes: string[]) {
+  const { supabase, user } = await getUser();
+
+  if (codes.length > 10) return { error: "Maximum 10 countries allowed." };
+
+  await supabase.from("profiles").update({
+    selected_countries: codes,
+    updated_at: new Date().toISOString(),
+  }).eq("id", user.id);
+
+  revalidatePath("/profile");
+  return { success: true };
+}
+
 export async function demoteMainClanToInterest() {
   const { supabase, user } = await getUser();
 

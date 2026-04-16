@@ -2,6 +2,7 @@ export { useProfile } from "./useProfile";
 export { usePlayer } from "./usePlayer";
 export { useClan } from "./useClan";
 export { useClanRef, type ClanRef } from "./useClanRef";
+export { useClanMemberLocations } from "./useClanMemberLocations";
 
 // Convenience hooks
 import { useProfile } from "./useProfile";

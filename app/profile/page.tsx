@@ -10,7 +10,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("linked_player_tag, main_clan_tag, clans_of_interest, display_name")
+    .select("linked_player_tag, main_clan_tag, clans_of_interest, display_name, selected_countries")
     .eq("id", user.id)
     .single();
 
@@ -28,6 +28,7 @@ export default async function ProfilePage() {
           initialPlayerTag={profile?.linked_player_tag ?? null}
           initialMainClanTag={profile?.main_clan_tag ?? null}
           initialClansOfInterest={(profile?.clans_of_interest as string[] | null) ?? []}
+          initialSelectedCountries={(profile?.selected_countries as string[] | null) ?? []}
         />
       </div>
     </main>
