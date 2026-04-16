@@ -3,6 +3,7 @@
 import { useState } from "react";
 import PlayerCard from "./components/PlayerCard";
 import ClanCard from "./components/ClanCard";
+import HashInput from "./components/HashInput";
 
 type Tab = "player" | "clan";
 
@@ -51,7 +52,7 @@ export default function Home() {
     }
   }
 
-  const placeholder = tab === "player" ? "#ABC123XYZ (player tag)" : "#ABC123XYZ (clan tag)";
+  const placeholder = tab === "player" ? "ABC123XYZ" : "CLAN12345";
   const label = tab === "player" ? "Player Tag" : "Clan Tag";
 
   return (
@@ -96,13 +97,13 @@ export default function Home() {
             <label className="block text-sm font-medium text-gray-300 mb-1">
               {label}
             </label>
-            <input
-              type="text"
+            <HashInput
               value={tag}
-              onChange={(e) => setTag(e.target.value)}
+              onChange={setTag}
               placeholder={placeholder}
+              prefixClassName="text-gray-500"
+              inputClassName="w-full bg-gray-800 border border-gray-700 rounded-lg py-2.5 pr-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition"
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition"
             />
           </div>
 

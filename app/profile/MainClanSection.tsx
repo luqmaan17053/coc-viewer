@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState, useTransition } from "react";
 import { saveMainClan } from "./actions";
 import { useClanPreview } from "./useTagPreview";
+import HashInput from "@/app/components/HashInput";
 
 export default function MainClanSection({
   savedTag,
@@ -76,12 +77,12 @@ export default function MainClanSection({
   }
 
   return (
-    <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+    <section className="glass-panel">
       <div className="flex items-center gap-2 mb-1">
-        <h2 className="text-lg font-semibold text-white">Main clan</h2>
+        <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>Main clan</h2>
         <span className="text-yellow-400 text-sm">⭐</span>
       </div>
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
         The clan you want to monitor most. Doesn&apos;t have to be your current clan. Leave empty to skip.
       </p>
 
@@ -93,31 +94,29 @@ export default function MainClanSection({
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex gap-2">
-          <input
-            type="text"
+          <HashInput
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="#CLAN12345"
-            autoComplete="off"
-            className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition font-mono"
+            onChange={setInput}
+            placeholder="CLAN12345"
+            inputClassName="flex-1 glass-input min-w-0"
           />
           <button
             type="submit"
             disabled={isPending || preview.status === "loading"}
-            className="bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-gray-950 font-semibold px-5 rounded-lg transition"
+            className="bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-gray-950 font-semibold px-5 rounded-lg transition shrink-0"
           >
             {isPending ? "Saving..." : "Save"}
           </button>
         </div>
 
-        {preview.status === "loading" && <p className="text-xs text-gray-500">Looking up clan...</p>}
+        {preview.status === "loading" && <p className="text-xs" style={{ color: "var(--text-muted)" }}>Looking up clan...</p>}
         {preview.status === "error" && input.trim() !== "" && (
           <p className="text-sm text-red-400">{preview.message}</p>
         )}
 
         {showPreview && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Preview:</p>
+            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Preview:</p>
             <ClanCard clan={preview.data} />
           </div>
         )}
@@ -145,18 +144,18 @@ export interface ClanData {
 
 export function ClanCard({ clan }: { clan: ClanData }) {
   return (
-    <div className="flex items-center gap-3 bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2.5">
+    <div className="glass-mini-card flex items-center gap-3">
       {clan.badgeUrls?.small ? (
         <div className="relative w-10 h-10 shrink-0">
           <Image src={clan.badgeUrls.small} alt={clan.name} fill className="object-contain" unoptimized />
         </div>
       ) : (
-        <div className="w-10 h-10 shrink-0 bg-gray-700 rounded-full" />
+        <div className="w-10 h-10 shrink-0 rounded-full" style={{ background: "var(--bg-surface-subtle)" }} />
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white truncate">{clan.name}</p>
-        <p className="text-xs text-gray-500 font-mono">{clan.tag}</p>
-        <p className="text-xs text-gray-500">Level {clan.clanLevel} · {clan.members}/50</p>
+        <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>{clan.name}</p>
+        <p className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>{clan.tag}</p>
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>Level {clan.clanLevel} · {clan.members}/50</p>
       </div>
     </div>
   );

@@ -63,14 +63,14 @@ function LoginForm() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: "var(--bg-base)" }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold text-yellow-400">⚔️ CoC Viewer</Link>
-          <p className="text-gray-400 mt-2">{mode === "signin" ? "Sign in to your dashboard" : "Create an account"}</p>
+          <p className="mt-2" style={{ color: "var(--text-secondary)" }}>{mode === "signin" ? "Sign in to your dashboard" : "Create an account"}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="glass-panel space-y-4">
           {/* OAuth buttons */}
           <div className="space-y-2">
             <button
@@ -103,27 +103,27 @@ function LoginForm() {
           {/* Divider */}
           <div className="relative py-1">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-800"></div>
+              <div className="w-full border-t" style={{ borderColor: "var(--border-subtle)" }}></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-gray-900 px-2 text-gray-500">or with email</span>
+              <span className="px-2" style={{ background: "var(--bg-surface)", color: "var(--text-muted)" }}>or with email</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition"
+              className="glass-input"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>Password</label>
             <input
               type="password"
               value={password}
@@ -131,7 +131,7 @@ function LoginForm() {
               required
               minLength={6}
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition"
+              className="glass-input"
             />
           </div>
 
@@ -153,14 +153,15 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); setInfo(""); }}
-            className="w-full text-sm text-gray-400 hover:text-yellow-400 transition"
+            className="w-full text-sm hover:text-yellow-400 transition"
+            style={{ color: "var(--text-muted)" }}
           >
             {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </button>
         </form>
 
         <p className="text-center mt-6">
-          <Link href="/" className="text-sm text-gray-500 hover:text-yellow-400 transition">← Back to lookup</Link>
+          <Link href="/" className="text-sm hover:text-yellow-400 transition" style={{ color: "var(--text-muted)" }}>← Back to lookup</Link>
         </p>
       </div>
     </main>
@@ -169,7 +170,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: "var(--bg-base)" }} />}>
       <LoginForm />
     </Suspense>
   );

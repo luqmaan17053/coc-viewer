@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import { useClanPreview } from "./useTagPreview";
 import { ClanCard, type ClanData } from "./MainClanSection";
+import HashInput from "@/app/components/HashInput";
 
 export default function ClansOfInterestSection({
   tags,
@@ -113,16 +114,16 @@ export default function ClansOfInterestSection({
   }
 
   return (
-    <section className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-1">
-        Clans of interest <span className="text-xs text-gray-500 font-normal">({tags.length}/10)</span>
+    <section className="glass-panel">
+      <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+        Clans of interest <span className="text-xs font-normal" style={{ color: "var(--text-muted)" }}>({tags.length}/10)</span>
       </h2>
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
         Quick-access clans reusable across widgets. Click ☆ to promote to main, ✕ to remove.
       </p>
 
       {tags.length === 0 && !showAddInput && (
-        <p className="text-sm text-gray-500 italic mb-4">No clans added yet.</p>
+        <p className="text-sm italic mb-4" style={{ color: "var(--text-muted)" }}>No clans added yet.</p>
       )}
 
       <div className="space-y-2">
@@ -132,8 +133,8 @@ export default function ClansOfInterestSection({
               {clanData[tag] ? (
                 <ClanCard clan={clanData[tag]} />
               ) : (
-                <div className="bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2.5">
-                  <p className="text-sm text-gray-500">Loading {tag}...</p>
+                <div className="glass-mini-card">
+                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>Loading {tag}...</p>
                 </div>
               )}
             </div>
@@ -142,7 +143,7 @@ export default function ClansOfInterestSection({
               onClick={() => handlePromote(tag)}
               disabled={isPending}
               title="Set as main clan"
-              className="text-gray-400 hover:text-yellow-400 disabled:opacity-40 w-10 h-10 flex items-center justify-center text-lg transition shrink-0"
+              className="text-yellow-400/60 hover:text-yellow-400 disabled:opacity-40 w-10 h-10 flex items-center justify-center text-lg transition shrink-0"
             >
               ☆
             </button>
@@ -151,7 +152,8 @@ export default function ClansOfInterestSection({
               onClick={() => handleRemove(tag)}
               disabled={isPending}
               title="Remove"
-              className="text-gray-400 hover:text-red-400 disabled:opacity-40 w-10 h-10 flex items-center justify-center text-lg transition shrink-0"
+              className="hover:text-red-400 disabled:opacity-40 w-10 h-10 flex items-center justify-center text-lg transition shrink-0"
+              style={{ color: "var(--text-muted)" }}
             >
               ✕
             </button>
@@ -162,31 +164,30 @@ export default function ClansOfInterestSection({
       {showAddInput ? (
         <form onSubmit={handleAdd} className="mt-4 space-y-3">
           <div className="flex gap-2">
-            <input
-              type="text"
+            <HashInput
               value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="#CLAN12345"
-              autoComplete="off"
+              onChange={setNewTag}
+              placeholder="CLAN12345"
+              inputClassName="flex-1 glass-input min-w-0"
               autoFocus
-              className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition font-mono"
             />
             <button
               type="submit"
               disabled={isPending || addPreview.status !== "success"}
-              className="bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-gray-950 font-semibold px-5 rounded-lg transition"
+              className="bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-gray-950 font-semibold px-5 rounded-lg transition shrink-0"
             >
               {isPending ? "Adding..." : "Add"}
             </button>
             <button
               type="button"
               onClick={() => { setShowAddInput(false); setNewTag(""); setError(""); }}
-              className="text-gray-400 hover:text-white transition px-3"
+              className="hover:text-yellow-400 transition px-3 shrink-0"
+              style={{ color: "var(--text-muted)" }}
             >
               Cancel
             </button>
           </div>
-          {addPreview.status === "loading" && <p className="text-xs text-gray-500">Looking up clan...</p>}
+          {addPreview.status === "loading" && <p className="text-xs" style={{ color: "var(--text-muted)" }}>Looking up clan...</p>}
           {addPreview.status === "error" && newTag.trim() !== "" && (
             <p className="text-sm text-red-400">{addPreview.message}</p>
           )}
@@ -197,7 +198,8 @@ export default function ClansOfInterestSection({
           <button
             type="button"
             onClick={() => setShowAddInput(true)}
-            className="mt-4 w-full border border-dashed border-gray-700 hover:border-yellow-500 text-gray-400 hover:text-yellow-400 rounded-lg py-2.5 text-sm transition"
+            className="mt-4 w-full border border-dashed hover:border-yellow-500 hover:text-yellow-400 rounded-lg py-2.5 text-sm transition"
+            style={{ borderColor: "var(--border-subtle)", color: "var(--text-muted)" }}
           >
             + Add a clan of interest
           </button>

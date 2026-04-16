@@ -7,7 +7,7 @@ export const definition: WidgetDefinition<PlayerStatsConfig> = {
   displayName: "Player Stats",
   description: "Any player's profile card (their stats, league, clan).",
   icon: "👤",
-  defaultConfig: { useLinkedPlayer: true, playerTag: null },
+  defaultConfig: { useLinkedPlayer: false, playerTag: null },
   defaultLayout: {
     lg: { w: 4, h: 5, minW: 3, minH: 5 },
     sm: { w: 1, h: 5, minH: 5 },

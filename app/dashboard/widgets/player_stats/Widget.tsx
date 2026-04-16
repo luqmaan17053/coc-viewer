@@ -27,7 +27,14 @@ export default function PlayerStatsWidget({
   const noConfigYet = !follow && !config.playerTag;
 
   return (
-    <div className="relative h-full bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+    <div
+      className="relative h-full rounded-2xl overflow-hidden flex flex-col backdrop-blur-md"
+      style={{
+        background: "var(--bg-surface)",
+        border: "1px solid var(--border-glass)",
+        boxShadow: "var(--glass-shadow)",
+      }}
+    >
       {editMode && (
         <WidgetChrome title="Player Stats" onRemove={onRemove} onOpenConfig={onOpenConfig} />
       )}
@@ -94,19 +101,23 @@ function UnconfiguredState({ editMode, onOpenConfig }: { editMode: boolean; onOp
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function PlayerContent({ player }: { player: any }) {
+  // New API uses leagueTier; old API uses league. Prefer leagueTier.
+  const leagueIconUrl = player.leagueTier?.iconUrls?.small ?? player.league?.iconUrls?.medium ?? null;
+  const leagueName = player.leagueTier?.name ?? player.league?.name ?? null;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        {player.league?.iconUrls?.medium ? (
+        {leagueIconUrl ? (
           <div className="relative w-12 h-12 shrink-0">
-            <Image src={player.league.iconUrls.medium} alt={player.league.name} fill className="object-contain" unoptimized />
+            <Image src={leagueIconUrl} alt={leagueName ?? "League"} fill className="object-contain" unoptimized />
           </div>
         ) : (
           <div className="w-12 h-12 shrink-0 bg-gray-800 rounded-full" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-base font-bold text-white truncate">{player.name}</p>
-          <p className="text-xs text-gray-500 font-mono">{player.tag}</p>
+          <p className="text-base font-bold truncate" style={{ color: "var(--text-primary)" }}>{player.name}</p>
+          <p className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>{player.tag}</p>
         </div>
       </div>
 
@@ -120,13 +131,16 @@ function PlayerContent({ player }: { player: any }) {
       </div>
 
       {player.clan && (
-        <div className="flex items-center gap-2 bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2">
+        <div
+          className="flex items-center gap-2 rounded-lg px-3 py-2"
+          style={{ background: "var(--bg-surface-subtle)", border: "1px solid var(--border-subtle)" }}
+        >
           {player.clan.badgeUrls?.small && (
             <div className="relative w-6 h-6 shrink-0">
               <Image src={player.clan.badgeUrls.small} alt={player.clan.name} fill className="object-contain" unoptimized />
             </div>
           )}
-          <p className="text-xs text-gray-300 truncate">{player.clan.name}</p>
+          <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>{player.clan.name}</p>
         </div>
       )}
     </div>
@@ -135,9 +149,12 @@ function PlayerContent({ player }: { player: any }) {
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-gray-800/60 rounded-lg px-3 py-2">
-      <p className="text-[10px] text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className="text-sm font-semibold text-yellow-400">{value}</p>
+    <div
+      className="rounded-lg px-3 py-2"
+      style={{ background: "var(--bg-surface-subtle)", border: "1px solid var(--border-subtle)" }}
+    >
+      <p className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{label}</p>
+      <p className="text-sm font-semibold" style={{ color: "var(--accent-text)" }}>{value}</p>
     </div>
   );
 }
@@ -152,8 +169,11 @@ function WidgetChrome({
   onOpenConfig: () => void;
 }) {
   return (
-    <div className="absolute top-0 left-0 right-0 bg-gray-950/90 backdrop-blur-sm border-b border-gray-800 px-3 py-1.5 flex items-center justify-between z-10">
-      <span className="widget-drag-handle cursor-move text-xs text-gray-400 font-semibold select-none">
+    <div
+      className="absolute top-0 left-0 right-0 backdrop-blur-sm px-3 py-1.5 flex items-center justify-between z-10"
+      style={{ background: "var(--bg-surface-subtle)", borderBottom: "1px solid var(--border-subtle)" }}
+    >
+      <span className="widget-drag-handle cursor-move text-xs font-semibold select-none" style={{ color: "var(--text-secondary)" }}>
         ⠿ {title}
       </span>
       <div className="flex items-center gap-1">

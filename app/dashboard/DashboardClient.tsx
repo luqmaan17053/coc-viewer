@@ -244,8 +244,8 @@ export default function DashboardClient({
                   onClick={() => setMobilePreview((v) => !v)}
                   className={
                     mobilePreview
-                      ? "bg-gray-800 border border-yellow-500 text-yellow-400 text-sm font-semibold px-3 py-2 rounded-lg transition"
-                      : "bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-yellow-500 text-gray-200 hover:text-yellow-400 text-sm font-semibold px-3 py-2 rounded-lg transition"
+                      ? "cursor-pointer bg-gray-800 border border-yellow-500 text-yellow-400 text-sm font-semibold px-3 py-2 rounded-lg transition"
+                      : "cursor-pointer bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-yellow-500 text-gray-200 hover:text-yellow-400 text-sm font-semibold px-3 py-2 rounded-lg transition"
                   }
                   title={mobilePreview ? "Switch back to desktop view" : "Preview mobile layout"}
                 >
@@ -254,7 +254,7 @@ export default function DashboardClient({
                 <button
                   type="button"
                   onClick={() => setPickerOpen(true)}
-                  className="bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-yellow-500 text-gray-200 hover:text-yellow-400 text-sm font-semibold px-4 py-2 rounded-lg transition"
+                  className="cursor-pointer bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-yellow-500 text-gray-200 hover:text-yellow-400 text-sm font-semibold px-4 py-2 rounded-lg transition"
                 >
                   + Add widget
                 </button>
@@ -265,9 +265,10 @@ export default function DashboardClient({
               onClick={() => setEditMode((v) => !v)}
               className={
                 editMode
-                  ? "bg-yellow-500 hover:bg-yellow-400 text-gray-950 text-sm font-semibold px-4 py-2 rounded-lg transition"
-                  : "border border-gray-700 hover:border-yellow-500 hover:text-yellow-400 text-gray-300 text-sm font-semibold px-4 py-2 rounded-lg transition"
+                  ? "cursor-pointer bg-yellow-500 hover:bg-yellow-400 text-gray-950 text-sm font-semibold px-4 py-2 rounded-lg transition"
+                  : "cursor-pointer border hover:border-yellow-500 hover:text-yellow-400 text-sm font-semibold px-4 py-2 rounded-lg transition"
               }
+              style={editMode ? undefined : { color: "var(--text-primary)", borderColor: "var(--border-glass)" }}
             >
               {editMode ? "Done editing" : "Edit dashboard"}
             </button>

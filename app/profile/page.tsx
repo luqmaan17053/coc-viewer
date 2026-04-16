@@ -15,11 +15,11 @@ export default async function ProfilePage() {
     .single();
 
   return (
-    <main className="min-h-screen bg-gray-950 py-8 px-4">
+    <main className="min-h-screen py-8 px-4" style={{ background: "var(--bg-base)" }}>
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-yellow-400">Profile setup</h1>
-          <p className="text-gray-400 mt-1 text-sm">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>Profile setup</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
             Link your CoC account and the clans you want to track. Widgets on your dashboard will use these.
           </p>
         </div>

@@ -32,6 +32,10 @@ interface PlayerData {
     name: string;
     iconUrls: { small: string; tiny: string; medium: string };
   };
+  leagueTier?: {
+    name: string;
+    iconUrls: { small: string; large: string };
+  };
   troops?: Troop[];
   heroes?: Troop[];
   spells?: Troop[];
@@ -98,17 +102,24 @@ export default function PlayerCard({ player }: { player: PlayerData }) {
   const builderHeroes = player.heroes?.filter((h) => h.village === "builderBase") ?? [];
   const homeSpells = player.spells?.filter((s) => s.village === "home") ?? [];
 
+  // New API uses leagueTier; old API uses league. Prefer leagueTier.
+  const effectiveLeague = player.leagueTier
+    ? { name: player.leagueTier.name, iconUrl: player.leagueTier.iconUrls.small }
+    : player.league?.iconUrls?.medium
+    ? { name: player.league.name, iconUrl: player.league.iconUrls.medium }
+    : null;
+
   return (
     <div className="space-y-6">
       {/* Profile Header */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           {/* League icon */}
-          {player.league?.iconUrls?.medium && (
+          {effectiveLeague && (
             <div className="relative w-16 h-16 shrink-0">
               <Image
-                src={player.league.iconUrls.medium}
-                alt={player.league.name}
+                src={effectiveLeague.iconUrl}
+                alt={effectiveLeague.name}
                 fill
                 className="object-contain"
                 unoptimized
@@ -124,10 +135,10 @@ export default function PlayerCard({ player }: { player: PlayerData }) {
             <p className="text-sm text-gray-400">
               Town Hall <span className="text-yellow-400 font-bold">{player.townHallLevel}</span>
               {" · "}Exp Level <span className="text-yellow-400 font-bold">{player.expLevel}</span>
-              {player.league && (
+              {effectiveLeague && (
                 <>
                   {" · "}
-                  <span className="text-blue-400">{player.league.name}</span>
+                  <span className="text-blue-400">{effectiveLeague.name}</span>
                 </>
               )}
             </p>

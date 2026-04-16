@@ -2,27 +2,99 @@
 @import "react-resizable/css/styles.css";
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light mode (default) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-base: #f0f2f5;
+  --bg-surface: rgba(255, 255, 255, 0.55);
+  --bg-surface-subtle: rgba(255, 255, 255, 0.40);
+  --border-glass: rgba(0, 0, 0, 0.12);
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.90);
+  --text-primary: #0f172a;
+  --text-secondary: #d97706;
+  --text-muted: #b45309;
+  --accent-text: #d97706;
+  --nav-bg: rgba(255, 255, 255, 0.75);
+  --nav-border: rgba(0, 0, 0, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.70);
+  --input-border: rgba(0, 0, 0, 0.12);
+  --input-focus: #d97706;
+  --mini-card-bg: rgba(255, 255, 255, 0.50);
+  --mini-card-border: rgba(0, 0, 0, 0.08);
+  --signout-color: #dc2626;
+}
+
+/* Dark mode */
+.dark {
+  --bg-base: #080d14;
+  --bg-surface: rgba(255, 255, 255, 0.05);
+  --bg-surface-subtle: rgba(255, 255, 255, 0.04);
+  --border-glass: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.50), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --text-primary: #f0f4f8;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent-text: #facc15;
+  --nav-bg: rgba(8, 13, 20, 0.85);
+  --nav-border: rgba(255, 255, 255, 0.06);
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.10);
+  --input-focus: #facc15;
+  --mini-card-bg: rgba(255, 255, 255, 0.04);
+  --mini-card-border: rgba(255, 255, 255, 0.08);
+  --signout-color: rgb(248 113 113 / 0.85);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Reusable glass UI classes */
+.glass-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.glass-input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-family: var(--font-geist-mono, monospace);
+  transition: border-color 0.2s;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--input-focus);
+}
+
+.glass-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.glass-mini-card {
+  background: var(--mini-card-bg);
+  border: 1px solid var(--mini-card-border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
 }

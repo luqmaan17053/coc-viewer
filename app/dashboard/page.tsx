@@ -24,10 +24,17 @@ export default async function DashboardPage() {
   const isProfileComplete = !!profile?.linked_player_tag;
 
   return (
-    <main className="min-h-screen bg-gray-950 py-8 px-4">
+    <main
+      className="min-h-screen py-8 px-4 relative"
+      style={{
+        background: "var(--bg-base)",
+        backgroundImage:
+          "radial-gradient(ellipse at 20% 30%, rgba(251,191,36,0.07) 0%, transparent 55%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.06) 0%, transparent 55%)",
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-yellow-400">Your Dashboard</h1>
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>Your Dashboard</h1>
           <Link href="/profile" className="text-sm text-gray-400 hover:text-yellow-400 transition">
             Edit profile →
           </Link>
