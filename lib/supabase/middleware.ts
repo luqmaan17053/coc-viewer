@@ -30,11 +30,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Gate /dashboard and anything under it
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  // Gate /dashboard and /admin (admin authz happens inside the page)
+  const path = request.nextUrl.pathname;
+  if (!user && (path.startsWith("/dashboard") || path.startsWith("/admin"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("next", request.nextUrl.pathname);
+    url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
 
