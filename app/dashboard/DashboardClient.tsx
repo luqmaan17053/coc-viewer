@@ -219,6 +219,21 @@ export default function DashboardClient({
           onClose={() => setPickerOpen(false)}
           onPick={handlePickWidget}
         />
+        {pendingWidgetType && (() => {
+          const def = WIDGET_REGISTRY[pendingWidgetType];
+          return (
+            <WidgetConfigModal
+              isOpen={!!def}
+              definition={def}
+              initialConfig={def?.defaultConfig ?? {}}
+              onSave={(newConfig) => {
+                addWidgetWithConfig(pendingWidgetType, newConfig);
+                setPendingWidgetType(null);
+              }}
+              onClose={() => setPendingWidgetType(null)}
+            />
+          );
+        })()}
       </>
     );
   }
