@@ -278,12 +278,15 @@ export default function DashboardClient({
 
       {/* Grid — wrapped in a max-width container when previewing mobile */}
       <div
-        className={
-          mobilePreview && !isRealMobile
-            ? "mx-auto transition-all bg-gray-900/30 rounded-xl p-2 border border-dashed border-gray-700"
-            : ""
-        }
-        style={mobilePreview && !isRealMobile ? { maxWidth: 390 } : undefined}
+        className={[
+          "transition-all duration-300",
+          editMode ? "blueprint-canvas rounded-xl p-3 border" : "",
+          mobilePreview && !isRealMobile ? "mx-auto" : "",
+        ].filter(Boolean).join(" ")}
+        style={{
+          ...(mobilePreview && !isRealMobile ? { maxWidth: 390 } : undefined),
+          ...(editMode ? { borderColor: "var(--blueprint-border)" } : undefined),
+        }}
       >
         {mobilePreview && !isRealMobile && (
           <p className="text-center text-xs text-yellow-500 mb-2">

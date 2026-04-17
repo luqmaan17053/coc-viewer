@@ -137,7 +137,7 @@ export default function SelectedCountriesSection({
 
       {/* Search + dropdown */}
       {selected.length < 10 && (
-        <div className="relative" ref={wrapperRef}>
+        <div ref={wrapperRef}>
           <input
             type="text"
             value={search}
@@ -151,7 +151,7 @@ export default function SelectedCountriesSection({
           />
           {dropdownOpen && filtered.length > 0 && (
             <div
-              className="absolute z-20 mt-1 w-full max-h-48 overflow-y-auto rounded-lg shadow-lg"
+              className="mt-1 w-full max-h-48 overflow-y-auto rounded-lg shadow-lg"
               style={{
                 background: "var(--bg-surface)",
                 border: "1px solid var(--border-glass)",
@@ -163,7 +163,6 @@ export default function SelectedCountriesSection({
                   type="button"
                   onClick={() => {
                     addCountry(loc.countryCode);
-                    setDropdownOpen(false);
                   }}
                   className="w-full text-left px-3 py-2 text-sm hover:bg-yellow-500/10 transition flex items-center gap-2"
                   style={{ color: "var(--text-primary)" }}

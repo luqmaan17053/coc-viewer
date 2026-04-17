@@ -28,23 +28,36 @@ export default function WidgetPicker({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl my-8 bg-gray-950 border border-gray-800 rounded-2xl"
+        className="relative w-full max-w-2xl my-8 rounded-2xl"
+        style={{
+          background: "var(--bg-base)",
+          border: "1px solid var(--border-glass)",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: "1px solid var(--border-glass)" }}
+        >
           <div>
-            <h2 className="text-lg font-bold text-white">Add a widget</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Pick one to add to your dashboard.</p>
+            <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+              Add a widget
+            </h2>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Pick one to add to your dashboard.
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition text-lg"
+            className="w-8 h-8 flex items-center justify-center transition text-lg hover:opacity-70"
+            style={{ color: "var(--text-muted)" }}
           >
             ✕
           </button>
@@ -53,7 +66,9 @@ export default function WidgetPicker({
         {/* Widget list */}
         <div className="p-4">
           {widgetTypes.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">No widgets available yet.</p>
+            <p className="text-sm text-center py-8" style={{ color: "var(--text-muted)" }}>
+              No widgets available yet.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {widgetTypes.map((def) => (
@@ -61,15 +76,21 @@ export default function WidgetPicker({
                   key={def.type}
                   type="button"
                   onClick={() => onPick(def.type)}
-                  className="text-left bg-gray-900 border border-gray-800 hover:border-yellow-500 rounded-xl p-4 transition group"
+                  className="text-left rounded-xl p-4 transition group [border-color:var(--border-glass)] hover:border-yellow-500 border"
+                  style={{ background: "var(--bg-surface)" }}
                 >
                   <div className="flex items-start gap-3">
                     <div className="text-2xl shrink-0">{def.icon}</div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition">
+                      <p
+                        className="text-sm font-semibold group-hover:text-yellow-400 transition"
+                        style={{ color: "var(--text-primary)" }}
+                      >
                         {def.displayName}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{def.description}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                        {def.description}
+                      </p>
                     </div>
                   </div>
                 </button>

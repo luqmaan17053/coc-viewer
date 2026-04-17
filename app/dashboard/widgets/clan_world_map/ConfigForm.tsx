@@ -35,7 +35,7 @@ export default function ClanWorldMapConfigForm({
       : `#${tagInput.trim().replace(/^#/, "").toUpperCase()}`;
 
   // --- Country selection ---
-  const [countrySource, setCountrySource] = useState<"profile" | "custom">(
+  const [countrySource, setCountrySource] = useState<"profile" | "custom" | "all">(
     initialConfig.countrySource ?? "profile"
   );
   const [customCodes, setCustomCodes] = useState<string[]>(
@@ -87,7 +87,7 @@ export default function ClanWorldMapConfigForm({
   // --- Validation ---
   const clanValid = useMain || (preview.status === "success" && normalized);
   const activeCodes = countrySource === "profile" ? profileCountries : customCodes;
-  const countriesValid = activeCodes.length > 0;
+  const countriesValid = countrySource === "all" || activeCodes.length > 0;
   const canSave = clanValid && countriesValid;
 
   function handleSubmit(e: React.FormEvent) {
@@ -101,6 +101,7 @@ export default function ClanWorldMapConfigForm({
       countryCodes: countrySource === "custom" ? customCodes : [],
       topCount: Math.max(1, Math.min(200, topCount)),
     });
+
   }
 
   return (
@@ -164,7 +165,7 @@ export default function ClanWorldMapConfigForm({
           Countries to search
         </h3>
 
-        <div className="flex gap-4 mb-3">
+        <div className="flex flex-wrap gap-4 mb-3">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
@@ -173,7 +174,7 @@ export default function ClanWorldMapConfigForm({
               className="accent-yellow-500"
             />
             <span className="text-sm" style={{ color: "var(--text-primary)" }}>
-              Use profile countries
+              Profile countries
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -187,7 +188,28 @@ export default function ClanWorldMapConfigForm({
               Custom
             </span>
           </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              checked={countrySource === "all"}
+              onChange={() => setCountrySource("all")}
+              className="accent-yellow-500"
+            />
+            <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+              All countries
+            </span>
+          </label>
         </div>
+
+        {countrySource === "all" && (
+          <p className="text-xs rounded-lg px-3 py-2" style={{
+            color: "var(--text-muted)",
+            background: "var(--bg-surface-subtle)",
+            border: "1px solid var(--border-subtle)",
+          }}>
+            Scans all 253 country leaderboards. First load takes ~15 s; results are cached for 30 min.
+          </p>
+        )}
 
         {countrySource === "profile" && (
           <div>
@@ -252,7 +274,7 @@ export default function ClanWorldMapConfigForm({
 
             {/* Search */}
             {customCodes.length < 10 && (
-              <div className="relative" ref={dropdownRef}>
+              <div ref={dropdownRef}>
                 <input
                   type="text"
                   value={search}
@@ -266,7 +288,7 @@ export default function ClanWorldMapConfigForm({
                 />
                 {dropdownOpen && filtered.length > 0 && (
                   <div
-                    className="absolute z-20 mt-1 w-full max-h-40 overflow-y-auto rounded-lg shadow-lg"
+                    className="mt-1 w-full max-h-40 overflow-y-auto rounded-lg shadow-lg"
                     style={{
                       background: "var(--bg-surface)",
                       border: "1px solid var(--border-glass)",
@@ -279,7 +301,6 @@ export default function ClanWorldMapConfigForm({
                         onClick={() => {
                           setCustomCodes((prev) => [...prev, loc.countryCode]);
                           setSearch("");
-                          setDropdownOpen(false);
                         }}
                         className="w-full text-left px-3 py-1.5 text-sm hover:bg-yellow-500/10 transition flex items-center gap-2"
                         style={{ color: "var(--text-primary)" }}

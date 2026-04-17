@@ -24,18 +24,20 @@ export default function ClanWorldMapWidget({
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   // Resolve country codes from profile or config
-  const countryCodes =
-    config.countrySource === "profile"
-      ? profileQuery.data?.selected_countries ?? []
-      : config.countryCodes ?? [];
+  const searchAll = config.countrySource === "all";
+  const countryCodes = searchAll
+    ? []
+    : config.countrySource === "profile"
+    ? profileQuery.data?.selected_countries ?? []
+    : config.countryCodes ?? [];
   const topCount = config.topCount ?? 200;
 
-  const locationsQuery = useClanMemberLocations(clanRef.tag, countryCodes, topCount);
+  const locationsQuery = useClanMemberLocations(clanRef.tag, countryCodes, topCount, searchAll);
   const data = locationsQuery.data as MemberLocationsData | undefined;
   const isLoading = !clanRef.resolved || locationsQuery.isLoading;
   const error = locationsQuery.error;
   const noTag = clanRef.resolved && !clanRef.tag;
-  const noCountries = countryCodes.length === 0;
+  const noCountries = !searchAll && countryCodes.length === 0;
 
   return (
     <div
@@ -52,18 +54,24 @@ export default function ClanWorldMapWidget({
 
       <div className={`flex-1 overflow-hidden flex flex-col ${editMode ? "pt-8" : ""}`}>
         {/* Header bar with flags + top count */}
-        {countryCodes.length > 0 && (
+        {(searchAll || countryCodes.length > 0) && (
           <div
             className="flex items-center gap-2 px-3 py-1.5 shrink-0 overflow-x-auto"
             style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {countryCodes.map((code) => (
-                <span key={code} className="text-base" title={code}>
-                  {countryCodeToFlag(code)}
-                </span>
-              ))}
-            </div>
+            {searchAll ? (
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                🌍 All countries
+              </span>
+            ) : (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {countryCodes.map((code) => (
+                  <span key={code} className="text-base" title={code}>
+                    {countryCodeToFlag(code)}
+                  </span>
+                ))}
+              </div>
+            )}
             <span
               className="text-xs px-2 py-0.5 rounded-full shrink-0"
               style={{

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { countryCodeToFlag } from "./countryCentroids";
+import { getCountryColor } from "./colors";
 import type { MemberLocation, MemberLocationsData } from "./types";
 
 interface CountryListProps {
@@ -29,17 +30,21 @@ export default function CountryList({ data }: CountryListProps) {
 
       {/* Scrollable cards */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
-        {data.countries.map((cluster) => (
-          <CountryCard
-            key={cluster.countryCode}
-            flag={countryCodeToFlag(cluster.countryCode)}
-            name={cluster.countryName}
-            code={cluster.countryCode}
-            players={cluster.players}
-            isExpanded={expanded === cluster.countryCode}
-            onToggle={() => toggle(cluster.countryCode)}
-          />
-        ))}
+        {(() => {
+          const maxCount = Math.max(1, ...data.countries.map((c) => c.players.length));
+          return data.countries.map((cluster) => (
+            <CountryCard
+              key={cluster.countryCode}
+              flag={countryCodeToFlag(cluster.countryCode)}
+              name={cluster.countryName}
+              code={cluster.countryCode}
+              players={cluster.players}
+              maxCount={maxCount}
+              isExpanded={expanded === cluster.countryCode}
+              onToggle={() => toggle(cluster.countryCode)}
+            />
+          ));
+        })()}
 
         {data.unknownCount > 0 && (
           <CountryCard
@@ -47,6 +52,7 @@ export default function CountryList({ data }: CountryListProps) {
             name="Unknown"
             code="__unknown"
             players={data.unknownPlayers}
+            maxCount={1}
             isExpanded={expanded === "__unknown"}
             onToggle={() => toggle("__unknown")}
           />
@@ -67,6 +73,7 @@ function CountryCard({
   name,
   code,
   players,
+  maxCount,
   isExpanded,
   onToggle,
 }: {
@@ -74,15 +81,17 @@ function CountryCard({
   name: string;
   code: string;
   players: MemberLocation[];
+  maxCount: number;
   isExpanded: boolean;
   onToggle: () => void;
 }) {
+  const tierColor = code !== "__unknown" ? getCountryColor(players.length, maxCount) : null;
   return (
     <div
       className="rounded-xl overflow-hidden"
       style={{
         background: "var(--bg-surface-subtle)",
-        border: "1px solid var(--border-subtle)",
+        border: tierColor ? `1px solid ${tierColor.bg}44` : "1px solid var(--border-subtle)",
       }}
     >
       <button
@@ -90,6 +99,12 @@ function CountryCard({
         onClick={onToggle}
         className="w-full flex items-center gap-3 px-4 py-3 text-left min-h-[48px]"
       >
+        {tierColor && (
+          <span
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ background: tierColor.bg }}
+          />
+        )}
         <span className="text-xl shrink-0">{flag}</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>
@@ -101,7 +116,11 @@ function CountryCard({
         </div>
         <span
           className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0"
-          style={{ background: "var(--accent-text)", color: "var(--bg-base)" }}
+          style={
+            tierColor
+              ? { background: tierColor.bg, color: tierColor.text }
+              : { background: "var(--text-muted)", color: "var(--bg-base)" }
+          }
         >
           {players.length}
         </span>
@@ -123,7 +142,13 @@ function CountryCard({
         >
           {players.map((p) => (
             <div key={p.tag} className="flex items-center justify-between py-1.5 min-h-[44px]">
-              <span className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
+              <span
+                className="shrink-0 text-xs font-mono w-8 text-right"
+                style={{ color: "var(--text-muted)" }}
+              >
+                #{p.rank}
+              </span>
+              <span className="flex-1 text-sm truncate" style={{ color: "var(--text-secondary)" }}>
                 {p.name}
               </span>
               <span className="shrink-0 ml-2 text-xs font-mono" style={{ color: "var(--text-muted)" }}>

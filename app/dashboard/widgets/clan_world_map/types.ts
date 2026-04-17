@@ -2,7 +2,7 @@ import type { ClanRef } from "../../hooks";
 
 export interface ClanWorldMapConfig {
   clanRef: ClanRef;
-  countrySource: "profile" | "custom";
+  countrySource: "profile" | "custom" | "all";
   countryCodes: string[];    // ISO alpha-2 codes, max 10
   topCount: number;          // 1-200, default 200
 }
@@ -12,6 +12,7 @@ export interface MemberLocation {
   tag: string;
   trophies: number;
   expLevel: number;
+  rank: number;
 }
 
 export interface CountryCluster {

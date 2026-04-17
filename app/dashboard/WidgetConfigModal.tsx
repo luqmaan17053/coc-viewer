@@ -51,32 +51,47 @@ export default function WidgetConfigModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="widget-config-title"
     >
       <div
-        className="relative w-full max-w-lg my-8 bg-gray-950 border border-gray-800 rounded-2xl"
+        className="relative w-full max-w-lg my-8 rounded-2xl"
+        style={{
+          background: "var(--bg-base)",
+          border: "1px solid var(--border-glass)",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: "1px solid var(--border-glass)" }}
+        >
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xl shrink-0">{definition.icon}</span>
             <div className="min-w-0">
-              <h2 id="widget-config-title" className="text-base font-bold text-white truncate">
+              <h2
+                id="widget-config-title"
+                className="text-base font-bold truncate"
+                style={{ color: "var(--text-primary)" }}
+              >
                 Configure {definition.displayName}
               </h2>
-              <p className="text-xs text-gray-500 truncate">{definition.description}</p>
+              <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>
+                {definition.description}
+              </p>
             </div>
           </div>
           <button
             ref={firstFocusableRef}
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center transition text-lg shrink-0"
+            className="w-8 h-8 flex items-center justify-center transition text-lg shrink-0 hover:opacity-70"
+            style={{ color: "var(--text-muted)" }}
             aria-label="Close"
           >
             ✕
@@ -92,7 +107,7 @@ export default function WidgetConfigModal({
               onCancel={onClose}
             />
           ) : (
-            <p className="text-sm text-gray-400 text-center py-4">
+            <p className="text-sm text-center py-4" style={{ color: "var(--text-muted)" }}>
               This widget has no configurable options.
             </p>
           )}

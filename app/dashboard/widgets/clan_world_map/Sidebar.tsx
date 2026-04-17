@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { countryCodeToFlag } from "./countryCentroids";
+import { getCountryColor } from "./colors";
 import type { CountryCluster, MemberLocation, MemberLocationsData } from "./types";
 
 interface SidebarProps {
@@ -38,20 +39,24 @@ export default function Sidebar({ data, selectedCountry, onSelectCountry }: Side
 
       {/* Scrollable list */}
       <div ref={listRef} className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5">
-        {data.countries.map((cluster) => (
-          <CountryGroup
-            key={cluster.countryCode}
-            cluster={cluster}
-            isSelected={selectedCountry === cluster.countryCode}
-            onSelect={() =>
-              onSelectCountry(selectedCountry === cluster.countryCode ? null : cluster.countryCode)
-            }
-            ref={(el) => {
-              if (el) itemRefs.current.set(cluster.countryCode, el);
-              else itemRefs.current.delete(cluster.countryCode);
-            }}
-          />
-        ))}
+        {(() => {
+          const maxCount = Math.max(1, ...data.countries.map((c) => c.players.length));
+          return data.countries.map((cluster) => (
+            <CountryGroup
+              key={cluster.countryCode}
+              cluster={cluster}
+              maxCount={maxCount}
+              isSelected={selectedCountry === cluster.countryCode}
+              onSelect={() =>
+                onSelectCountry(selectedCountry === cluster.countryCode ? null : cluster.countryCode)
+              }
+              ref={(el) => {
+                if (el) itemRefs.current.set(cluster.countryCode, el);
+                else itemRefs.current.delete(cluster.countryCode);
+              }}
+            />
+          ));
+        })()}
 
         {/* Unknown group */}
         {data.unknownCount > 0 && (
@@ -75,35 +80,42 @@ const CountryGroup = forwardRef<
   HTMLDivElement,
   {
     cluster: CountryCluster;
+    maxCount: number;
     isSelected: boolean;
     onSelect: () => void;
   }
->(function CountryGroup({ cluster, isSelected, onSelect }, ref) {
+>(function CountryGroup({ cluster, maxCount, isSelected, onSelect }, ref) {
+  const tierColor = getCountryColor(cluster.players.length, maxCount);
   return (
     <div ref={ref}>
       <button
         type="button"
         onClick={onSelect}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all"
         style={{
-          background: isSelected ? "var(--bg-surface-subtle)" : "transparent",
-          border: isSelected ? "1px solid var(--border-glass)" : "1px solid transparent",
+          background: isSelected ? `${tierColor.bg}18` : "transparent",
+          border: isSelected ? `1px solid ${tierColor.bg}55` : "1px solid transparent",
         }}
       >
+        {/* Tier color dot */}
+        <span
+          className="w-2 h-2 rounded-full shrink-0"
+          style={{ background: tierColor.bg }}
+        />
         <span className="text-base shrink-0">{countryCodeToFlag(cluster.countryCode)}</span>
         <span className="flex-1 text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
           {cluster.countryName}
         </span>
         <span
           className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
-          style={{ background: "var(--accent-text)", color: "var(--bg-base)" }}
+          style={{ background: tierColor.bg, color: tierColor.text }}
         >
           {cluster.players.length}
         </span>
       </button>
 
       {isSelected && (
-        <div className="pl-10 pr-3 pb-1 space-y-0.5">
+        <div className="pl-11 pr-3 pb-1 space-y-0.5">
           {cluster.players.map((p) => (
             <PlayerRow key={p.tag} player={p} />
           ))}
@@ -160,11 +172,17 @@ function UnknownGroup({
 
 function PlayerRow({ player }: { player: MemberLocation }) {
   return (
-    <div className="flex items-center justify-between py-1 text-xs">
-      <span className="truncate" style={{ color: "var(--text-secondary)" }}>
+    <div className="flex items-center justify-between py-1 text-xs gap-2">
+      <span
+        className="shrink-0 font-mono w-7 text-right"
+        style={{ color: "var(--text-muted)" }}
+      >
+        #{player.rank}
+      </span>
+      <span className="flex-1 truncate" style={{ color: "var(--text-secondary)" }}>
         {player.name}
       </span>
-      <span className="shrink-0 ml-2 font-mono" style={{ color: "var(--text-muted)" }}>
+      <span className="shrink-0 font-mono" style={{ color: "var(--text-muted)" }}>
         🏆{player.trophies}
       </span>
     </div>

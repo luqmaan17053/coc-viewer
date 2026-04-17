@@ -111,6 +111,34 @@ interface LeaderboardPlayer {
   name: string;
   trophies: number;
   expLevel: number;
+  rank: number;
+}
+
+const BATCH_SIZE = 20;
+const BATCH_DELAY_MS = 300;
+
+async function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchLeaderboardsBatched(
+  codes: string[],
+  limit: number
+): Promise<PromiseSettledResult<{ code: string; players: LeaderboardPlayer[] }>[]> {
+  const results: PromiseSettledResult<{ code: string; players: LeaderboardPlayer[] }>[] = [];
+  for (let i = 0; i < codes.length; i += BATCH_SIZE) {
+    const batch = codes.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.allSettled(
+      batch.map((code) =>
+        fetchLeaderboard(COUNTRY_TO_LOCATION[code], limit).then((players) => ({ code, players }))
+      )
+    );
+    results.push(...batchResults);
+    if (i + BATCH_SIZE < codes.length) {
+      await delay(BATCH_DELAY_MS);
+    }
+  }
+  return results;
 }
 
 async function fetchLeaderboard(
@@ -133,6 +161,7 @@ async function fetchLeaderboard(
     name: p.name as string,
     trophies: p.trophies as number,
     expLevel: p.expLevel as number,
+    rank: p.rank as number,
   }));
 }
 
@@ -145,19 +174,20 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { clanTag, countryCodes, topCount } = body as {
+  const { clanTag, countryCodes, topCount, searchAll } = body as {
     clanTag: string;
     countryCodes: string[];
     topCount: number;
+    searchAll?: boolean;
   };
 
   if (!clanTag) {
     return NextResponse.json({ error: "Clan tag is required." }, { status: 400 });
   }
-  if (!Array.isArray(countryCodes) || countryCodes.length === 0) {
+  if (!searchAll && (!Array.isArray(countryCodes) || countryCodes.length === 0)) {
     return NextResponse.json({ error: "At least one country is required." }, { status: 400 });
   }
-  if (countryCodes.length > 10) {
+  if (!searchAll && countryCodes.length > 10) {
     return NextResponse.json({ error: "Maximum 10 countries allowed." }, { status: 400 });
   }
 
@@ -185,16 +215,21 @@ export async function POST(req: NextRequest) {
   const memberTagSet = new Set(memberList.map((m) => m.tag));
   const totalMembers = memberList.length;
 
-  // 2. Fetch leaderboards for each selected country in parallel
-  const validCodes = countryCodes.filter((c) => COUNTRY_TO_LOCATION[c]);
-  const leaderboardResults = await Promise.allSettled(
-    validCodes.map((code) =>
-      fetchLeaderboard(COUNTRY_TO_LOCATION[code], clampedTop).then((players) => ({
-        code,
-        players,
-      }))
-    )
-  );
+  // 2. Fetch leaderboards — all countries (batched) or selected subset (parallel)
+  const codesToSearch = searchAll
+    ? Object.keys(COUNTRY_TO_LOCATION)
+    : countryCodes.filter((c) => COUNTRY_TO_LOCATION[c]);
+
+  const leaderboardResults = searchAll
+    ? await fetchLeaderboardsBatched(codesToSearch, clampedTop)
+    : await Promise.allSettled(
+        codesToSearch.map((code) =>
+          fetchLeaderboard(COUNTRY_TO_LOCATION[code], clampedTop).then((players) => ({
+            code,
+            players,
+          }))
+        )
+      );
 
   // 3. Cross-reference: find clan members in each country's leaderboard
   const matchedTags = new Set<string>();
@@ -221,6 +256,7 @@ export async function POST(req: NextRequest) {
           tag: p.tag,
           trophies: p.trophies,
           expLevel: p.expLevel,
+          rank: p.rank,
         })),
       });
       matched.forEach((p) => matchedTags.add(p.tag));
@@ -245,6 +281,6 @@ export async function POST(req: NextRequest) {
     unknownCount: unknownPlayers.length,
     unknownPlayers,
     totalMembers,
-    searchedCountries: validCodes,
+    searchedCountries: codesToSearch,
   });
 }

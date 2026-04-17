@@ -5,6 +5,47 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Map base country fill */
+:root {
+  --map-country-base: #b8c9d9;
+  --map-country-stroke: #8fa8be;
+}
+
+.dark {
+  --map-country-base: rgba(255, 255, 255, 0.09);
+  --map-country-stroke: rgba(255, 255, 255, 0.15);
+}
+
+/* Blueprint canvas variables */
+:root {
+  --blueprint-bg: #dce8f8;
+  --blueprint-major: rgba(37, 99, 200, 0.22);
+  --blueprint-minor: rgba(37, 99, 200, 0.09);
+  --blueprint-border: rgba(37, 99, 200, 0.35);
+  --blueprint-corner: rgba(37, 99, 200, 0.50);
+}
+
+.dark {
+  --blueprint-bg: #060c18;
+  --blueprint-major: rgba(96, 165, 250, 0.20);
+  --blueprint-minor: rgba(96, 165, 250, 0.07);
+  --blueprint-border: rgba(96, 165, 250, 0.28);
+  --blueprint-corner: rgba(96, 165, 250, 0.55);
+}
+
+.blueprint-canvas {
+  background-color: var(--blueprint-bg);
+  background-image:
+    /* major grid lines */
+    linear-gradient(var(--blueprint-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blueprint-major) 1px, transparent 1px),
+    /* minor grid lines */
+    linear-gradient(var(--blueprint-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blueprint-minor) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px, 8px 8px, 8px 8px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+}
+
 /* Light mode (default) */
 :root {
   --bg-base: #f0f2f5;
