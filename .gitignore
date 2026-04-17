@@ -44,3 +44,6 @@ next-env.d.ts
 
 # image
 Image from Gboard clipboard.jpg
+
+# scratch / debug
+loc_test.json
